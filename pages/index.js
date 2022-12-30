@@ -1,20 +1,28 @@
 import Header from "../components/Header"
-import Image from "next/image"
-import logo from "../public/hy.png"
+import { useEffect, useState } from "react"
+import { WebSocket } from "ws"
 
 export default function Home() {
+  // const [wsInstance, setWsInstance] = useState(null)
+  const isBrowser = typeof window !== "undefined"
+  const futures = "btcusdt"
+
+  useEffect(() => {
+    if (isBrowser) {
+      const ws = new WebSocket(
+        `wss://fstream.binance.com/ws/${futures}@markPrice@1s`
+      )
+
+      ws.on("message", (data) => {
+        const markPrice = JSON.parse(data)
+        console.log(markPrice)
+      })
+    }
+  }, [])
+
   return (
     <>
       <Header />
-      <Image
-        src={logo}
-        alt="hanyang logo"
-        width={300}
-        height={300}
-        priority
-        style={{ marginLeft: "100px", marginTop: "50px" }}
-      />
-      <span>Project #1 수강신청</span>
     </>
   )
 }
