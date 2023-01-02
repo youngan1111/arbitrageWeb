@@ -28,10 +28,10 @@ const sections = [
           flexWrap: "wrap",
         }}
       >
-        과목 조회 및 변경
+        dYdX
       </Box>
     ),
-    url: "/changeCatalog",
+    url: "/dydx",
   },
 ]
 

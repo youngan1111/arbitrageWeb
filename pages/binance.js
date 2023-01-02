@@ -8,6 +8,7 @@ import TableContainer from "@mui/material/TableContainer"
 import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
+import Grid from "@mui/material/Grid"
 
 export default function MySchedule() {
   const [markPrice, setMarkPrice] = useState(null)
@@ -15,6 +16,14 @@ export default function MySchedule() {
   const [indexPrice, setIndexPrice] = useState(null)
   const [fundingRate, setFundingRate] = useState(null)
   const [nextFundingRate, setNextFundingRate] = useState(null)
+  const [orderBookTime, setOrderBookTime] = useState(null)
+  const [currentPrice, setCurrentPrice] = useState(null)
+  const [bids, setBids] = useState(
+    Array.from({ length: 5 }, () => Array.from({ length: 2 }, () => null))
+  )
+  const [asks, setAsks] = useState(
+    Array.from({ length: 5 }, () => Array.from({ length: 2 }, () => null))
+  )
 
   const futures = "btcusdt"
 
@@ -31,51 +40,157 @@ export default function MySchedule() {
       setNextFundingRate(json.T)
     }
 
-    // const orderBookEvery100ms = new WebSocket(
-    //   `wss://fstream.binance.com/stream?streams=${futures}@depth5@100ms`
-    // )
-    // orderBookEvery100ms.onmessage = ({ data }) => {
-    //   const json = JSON.parse(data)
-    //   console.log(json.E)
-    //   setMarkPrice(json.E)
-    // }
+    const orderBookEvery100ms = new WebSocket(
+      `wss://fstream.binance.com/stream?streams=${futures}@depth5@500ms` // 250ms, 500ms or 100ms
+    )
+    orderBookEvery100ms.onmessage = ({ data }) => {
+      const json = JSON.parse(data).data
+      setOrderBookTime(json.E)
+      setBids(json.b)
+      setAsks(json.a)
+    }
+
+    const aggTrade = new WebSocket(
+      `wss://fstream.binance.com/ws/${futures}@aggTrade`
+    )
+    aggTrade.onmessage = ({ data }) => {
+      const json = JSON.parse(data)
+      setCurrentPrice(json.p)
+    }
   }, [])
 
   return (
     <>
       <Header />
       <Typography sx={{ ml: 3, mt: 1, mb: 2 }} variant="h5" gutterBottom>
-        · BINANCE
+        · Mark Price 1초
+      </Typography>
+      <Paper elevation={1} sx={{ m: 3 }}>
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Symbol</TableCell>
+                <TableCell align="right">Mark Price Time</TableCell>
+                <TableCell align="right">Mark Price ($)</TableCell>
+                <TableCell align="right">Index Price ($)</TableCell>
+                <TableCell align="right">
+                  Mark Price – Index Price ($)
+                </TableCell>
+                <TableCell align="right">Funding Rate</TableCell>
+                <TableCell align="right">Next Funding Rate Time</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  {futures}
+                </TableCell>
+                <TableCell align="right">
+                  {new Date(markPriceTime).toLocaleString()}
+                </TableCell>
+                <TableCell align="right">{markPrice}</TableCell>
+                <TableCell align="right">{indexPrice}</TableCell>
+                <TableCell align="right">{markPrice - indexPrice}</TableCell>
+                <TableCell align="right">{fundingRate}</TableCell>
+                <TableCell align="right">
+                  {new Date(nextFundingRate).toLocaleString()}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
+
+      <Typography
+        sx={{ ml: 3, mt: 1, mb: 2 }}
+        variant="h5"
+        gutterBottom
+        display="inline"
+      >
+        · 선물 호가창
+      </Typography>
+      <Typography
+        sx={{ ml: 1, mt: 1, mb: 2 }}
+        variant="subtitle1"
+        gutterBottom
+        display="inline"
+      >
+        {new Date(orderBookTime).toLocaleString()}
       </Typography>
 
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Symbol</TableCell>
-              <TableCell align="right">Mark Price</TableCell>
-              <TableCell align="right">Mark Price Time</TableCell>
-              <TableCell align="right">Index Price</TableCell>
-              <TableCell align="right">Funding Rate</TableCell>
-              <TableCell align="right">Next Funding Rate Time</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow
-              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                {futures}
-              </TableCell>
-              <TableCell align="right">{markPrice}</TableCell>
-              <TableCell align="right">{markPriceTime}</TableCell>
-              <TableCell align="right">{indexPrice}</TableCell>
-              <TableCell align="right">{fundingRate}</TableCell>
-              <TableCell align="right">{nextFundingRate}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Typography
+        sx={{ ml: 40, mt: 1, mb: -2 }}
+        variant="h6"
+        gutterBottom
+        style={{ color: bids[0][0] == currentPrice ? "red" : "blue" }}
+      >
+        체결가: {currentPrice}
+      </Typography>
+
+      <Grid container>
+        <Paper elevation={1} sx={{ m: 3, width: 1 / 4 }}>
+          <TableContainer component={Paper}>
+            <Table aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Volume</TableCell>
+                  <TableCell align="right">
+                    매수호가(최상단 = 가장 높은 값)
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {bids.map((bid, index) => (
+                  <TableRow
+                    key={index}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {bid[1]}
+                    </TableCell>
+                    <TableCell align="right" style={{ color: "red" }}>
+                      {bid[0]}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+
+        <Paper elevation={1} sx={{ m: 3, width: 1 / 4 }}>
+          <TableContainer component={Paper}>
+            <Table aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>매도호가(최상단 = 가장 낮은 값)</TableCell>
+                  <TableCell align="right">Volume</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {asks.map((ask, index) => (
+                  <TableRow
+                    key={index}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      style={{ color: "blue" }}
+                    >
+                      {ask[0]}
+                    </TableCell>
+                    <TableCell align="right">{ask[1]}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+      </Grid>
     </>
   )
 }
