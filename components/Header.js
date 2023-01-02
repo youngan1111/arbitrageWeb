@@ -14,13 +14,10 @@ const sections = [
           flexWrap: "wrap",
         }}
       >
-        수강편람
+        BINANCE
       </Box>
     ),
-    url: "/courseCatalog",
-    everybody: true,
-    user: true,
-    admin: true,
+    url: "/binance",
   },
   {
     title: (
@@ -35,9 +32,6 @@ const sections = [
       </Box>
     ),
     url: "/changeCatalog",
-    everybody: false,
-    user: false,
-    admin: true,
   },
 ]
 
@@ -66,21 +60,19 @@ export default function Header() {
         sx={{ justifyContent: "flex-start" }}
       >
         {sections.map((section) => {
-          if (section.admin == true) {
-            return (
-              <Link
-                underline="hover"
-                color="inherit"
-                noWrap
-                key={section.url}
-                variant="body2"
-                href={section.url}
-                sx={{ p: 1, mr: 5 }}
-              >
-                {section.title}
-              </Link>
-            )
-          }
+          return (
+            <Link
+              underline="hover"
+              color="inherit"
+              noWrap
+              key={section.url}
+              variant="body2"
+              href={section.url}
+              sx={{ p: 1, mr: 5 }}
+            >
+              {section.title}
+            </Link>
+          )
         })}
       </Toolbar>
     </>
