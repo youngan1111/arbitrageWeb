@@ -2,7 +2,6 @@ import Box from "@mui/material/Box"
 import Link from "@mui/material/Link"
 import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
-import { useEffect } from "react"
 
 const sections = [
   {
@@ -35,7 +34,7 @@ const sections = [
   },
 ]
 
-export default function Header() {
+export default function Header({ path }) {
   return (
     <>
       <Toolbar sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -69,6 +68,9 @@ export default function Header() {
               variant="body2"
               href={section.url}
               sx={{ p: 1, mr: 5 }}
+              style={{
+                textDecorationLine: path == section.url ? "underline" : "none",
+              }}
             >
               {section.title}
             </Link>

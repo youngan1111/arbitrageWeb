@@ -10,7 +10,7 @@ import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
 import Grid from "@mui/material/Grid"
 
-export default function MySchedule() {
+export default function Binance() {
   const [markPrice, setMarkPrice] = useState(null)
   const [markPriceTime, setMarkPriceTime] = useState(null)
   const [indexPrice, setIndexPrice] = useState(null)
@@ -61,7 +61,7 @@ export default function MySchedule() {
 
   return (
     <>
-      <Header />
+      <Header path="/binance" />
       <Typography sx={{ ml: 3, mt: 1, mb: 2 }} variant="h5" gutterBottom>
         · Mark Price 1초
       </Typography>
@@ -76,6 +76,9 @@ export default function MySchedule() {
                 <TableCell align="right">Index Price ($)</TableCell>
                 <TableCell align="right">
                   Mark Price – Index Price ($)
+                </TableCell>
+                <TableCell align="right">
+                  Mark Price / Index Price (%)
                 </TableCell>
                 <TableCell align="right">Funding Rate</TableCell>
                 <TableCell align="right">Next Funding Rate Time</TableCell>
@@ -94,6 +97,9 @@ export default function MySchedule() {
                 <TableCell align="right">{markPrice}</TableCell>
                 <TableCell align="right">{indexPrice}</TableCell>
                 <TableCell align="right">{markPrice - indexPrice}</TableCell>
+                <TableCell align="right">
+                  {markPrice / indexPrice - 1}
+                </TableCell>
                 <TableCell align="right">{fundingRate}</TableCell>
                 <TableCell align="right">
                   {new Date(nextFundingRate).toLocaleString()}
