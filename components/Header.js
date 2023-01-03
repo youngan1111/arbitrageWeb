@@ -5,32 +5,16 @@ import Typography from "@mui/material/Typography"
 
 const sections = [
   {
-    title: (
-      <Box
-        style={{
-          display: "flex",
-          alignItems: "center",
-          flexWrap: "wrap",
-        }}
-      >
-        BINANCE
-      </Box>
-    ),
+    title: "BINANCE",
     url: "/binance",
   },
   {
-    title: (
-      <Box
-        style={{
-          display: "flex",
-          alignItems: "center",
-          flexWrap: "wrap",
-        }}
-      >
-        dYdX
-      </Box>
-    ),
+    title: "dYdX",
     url: "/dydx",
+  },
+  {
+    title: "BINANCE & dYdX",
+    url: "/binancedydx",
   },
 ]
 
@@ -72,7 +56,15 @@ export default function Header({ path }) {
                 textDecorationLine: path == section.url ? "underline" : "none",
               }}
             >
-              {section.title}
+              <Box
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                }}
+              >
+                {section.title}
+              </Box>
             </Link>
           )
         })}

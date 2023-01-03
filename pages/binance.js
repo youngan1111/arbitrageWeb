@@ -9,20 +9,21 @@ import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
 import Grid from "@mui/material/Grid"
+import thousandsSeparator from "../utils/thousandsSeparator"
 
 export default function Binance() {
-  const [markPrice, setMarkPrice] = useState(null)
+  const [markPrice, setMarkPrice] = useState(1)
   const [markPriceTime, setMarkPriceTime] = useState(null)
-  const [indexPrice, setIndexPrice] = useState(null)
+  const [indexPrice, setIndexPrice] = useState(1)
   const [fundingRate, setFundingRate] = useState(null)
   const [nextFundingRate, setNextFundingRate] = useState(null)
   const [orderBookTime, setOrderBookTime] = useState(null)
   const [currentPrice, setCurrentPrice] = useState(null)
   const [bids, setBids] = useState(
-    Array.from({ length: 5 }, () => Array.from({ length: 2 }, () => null))
+    Array.from({ length: 10 }, () => Array.from({ length: 2 }, () => null))
   )
   const [asks, setAsks] = useState(
-    Array.from({ length: 5 }, () => Array.from({ length: 2 }, () => null))
+    Array.from({ length: 10 }, () => Array.from({ length: 2 }, () => null))
   )
 
   const futures = "btcusdt"
@@ -41,7 +42,7 @@ export default function Binance() {
     }
 
     const orderBookEvery100ms = new WebSocket(
-      `wss://fstream.binance.com/stream?streams=${futures}@depth5@500ms` // 250ms, 500ms or 100ms
+      `wss://fstream.binance.com/stream?streams=${futures}@depth10@500ms` // 250ms, 500ms or 100ms
     )
     orderBookEvery100ms.onmessage = ({ data }) => {
       const json = JSON.parse(data).data
@@ -94,11 +95,15 @@ export default function Binance() {
                 <TableCell align="right">
                   {new Date(markPriceTime).toLocaleString()}
                 </TableCell>
-                <TableCell align="right">{markPrice}</TableCell>
-                <TableCell align="right">{indexPrice}</TableCell>
+                <TableCell align="right">
+                  {thousandsSeparator(markPrice)}
+                </TableCell>
+                <TableCell align="right">
+                  {thousandsSeparator(indexPrice)}
+                </TableCell>
                 <TableCell align="right">{markPrice - indexPrice}</TableCell>
                 <TableCell align="right">
-                  {markPrice / indexPrice - 1}
+                  {(markPrice / indexPrice - 1) * 100}
                 </TableCell>
                 <TableCell align="right">{fundingRate}</TableCell>
                 <TableCell align="right">
@@ -133,13 +138,13 @@ export default function Binance() {
         gutterBottom
         style={{ color: bids[0][0] == currentPrice ? "red" : "blue" }}
       >
-        체결가: {currentPrice}
+        체결가: ${thousandsSeparator(currentPrice)}
       </Typography>
 
       <Grid container>
         <Paper elevation={1} sx={{ m: 3, width: 1 / 4 }}>
           <TableContainer component={Paper}>
-            <Table aria-label="simple table">
+            <Table aria-label="simple table" size="small">
               <TableHead>
                 <TableRow>
                   <TableCell>Volume</TableCell>
@@ -158,7 +163,7 @@ export default function Binance() {
                       {bid[1]}
                     </TableCell>
                     <TableCell align="right" style={{ color: "red" }}>
-                      {bid[0]}
+                      {thousandsSeparator(bid[0])}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -169,7 +174,7 @@ export default function Binance() {
 
         <Paper elevation={1} sx={{ m: 3, width: 1 / 4 }}>
           <TableContainer component={Paper}>
-            <Table aria-label="simple table">
+            <Table aria-label="simple table" size="small">
               <TableHead>
                 <TableRow>
                   <TableCell>매도호가(최상단 = 가장 낮은 값)</TableCell>
@@ -187,7 +192,7 @@ export default function Binance() {
                       scope="row"
                       style={{ color: "blue" }}
                     >
-                      {ask[0]}
+                      {thousandsSeparator(ask[0])}
                     </TableCell>
                     <TableCell align="right">{ask[1]}</TableCell>
                   </TableRow>
@@ -197,6 +202,13 @@ export default function Binance() {
           </TableContainer>
         </Paper>
       </Grid>
+
+      <Typography sx={{ ml: 3, mt: 1, mb: 2 }} variant="subtitle1" gutterBottom>
+        Mark Price: unrealizaed PnL과 청산을 계산하는 가격
+      </Typography>
+      <Typography sx={{ ml: 3, mt: 1, mb: 2 }} variant="subtitle1" gutterBottom>
+        Index Price: 현물 가격이라고 생각해도 된다.
+      </Typography>
     </>
   )
 }

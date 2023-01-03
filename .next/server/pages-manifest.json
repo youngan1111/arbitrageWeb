@@ -3,5 +3,5 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/binance": "pages/binance.js",
-  "/dydx": "pages/dydx.js"
+  "/binancedydx": "pages/binancedydx.js"
 }

@@ -10,19 +10,20 @@ import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
 import Grid from "@mui/material/Grid"
 import axios from "axios"
+import thousandsSeparator from "../utils/thousandsSeparator"
 
 export default function dYdX() {
-  const [markPrice, setMarkPrice] = useState(null)
-  const [markPriceTime, setMarkPriceTime] = useState(null)
-  const [indexPrice, setIndexPrice] = useState(null)
+  const [oraclePrice, setOraclePrice] = useState(1)
+  const [oraclePriceTime, setOraclePriceTime] = useState(null)
+  const [indexPrice, setIndexPrice] = useState(1)
   const [fundingRate, setFundingRate] = useState(null)
   const [nextFundingRate, setNextFundingRate] = useState(null)
   const [currentPrice, setCurrentPrice] = useState(null)
   const [asks, setAsks] = useState(
-    Array.from({ length: 5 }, () => new Object())
+    Array.from({ length: 10 }, () => new Object())
   )
   const [bids, setBids] = useState(
-    Array.from({ length: 5 }, () => new Object())
+    Array.from({ length: 10 }, () => new Object())
   )
 
   const futures = "BTC-USD"
@@ -34,8 +35,8 @@ export default function dYdX() {
           market: futures,
         },
       })
-      setMarkPrice(data.markets[futures].oraclePrice)
-      setMarkPriceTime(new Date().getTime())
+      setOraclePrice(data.markets[futures].oraclePrice)
+      setOraclePriceTime(new Date().getTime())
       setIndexPrice(data.markets[futures].indexPrice)
       setFundingRate(data.markets[futures].nextFundingRate)
       setNextFundingRate(data.markets[futures].nextFundingAt)
@@ -45,16 +46,16 @@ export default function dYdX() {
       const { data } = await axios.get(
         "https://api.dydx.exchange/v3/orderbook/BTC-USD"
       )
-      setAsks(data.asks.slice(undefined, 5))
-      setBids(data.bids.slice(undefined, 5))
-    }, 1000)
+      setAsks(data.asks.slice(undefined, 10))
+      setBids(data.bids.slice(undefined, 10))
+    }, 100)
   }, [])
 
   return (
     <>
       <Header path="/dydx" />
       <Typography sx={{ ml: 3, mt: 1, mb: 2 }} variant="h5" gutterBottom>
-        · Mark Price 1초
+        · Market data 1초
       </Typography>
       <Paper elevation={1} sx={{ m: 3 }}>
         <TableContainer component={Paper}>
@@ -62,11 +63,14 @@ export default function dYdX() {
             <TableHead>
               <TableRow>
                 <TableCell>Symbol</TableCell>
-                <TableCell align="right">Mark Price Time</TableCell>
-                <TableCell align="right">Mark Price ($)</TableCell>
+                <TableCell align="right">Oracle Price Time</TableCell>
+                <TableCell align="right">Oracle Price ($)</TableCell>
                 <TableCell align="right">Index Price ($)</TableCell>
                 <TableCell align="right">
-                  Mark Price – Index Price ($)
+                  Oracle Price – Index Price ($)
+                </TableCell>
+                <TableCell align="right">
+                  Oracle Price / Index Price (%)
                 </TableCell>
                 <TableCell align="right">Funding Rate</TableCell>
                 <TableCell align="right">Next Funding Rate Time</TableCell>
@@ -80,11 +84,18 @@ export default function dYdX() {
                   {futures}
                 </TableCell>
                 <TableCell align="right">
-                  {new Date(markPriceTime).toLocaleString()}
+                  {new Date(oraclePriceTime).toLocaleString()}
                 </TableCell>
-                <TableCell align="right">{markPrice}</TableCell>
-                <TableCell align="right">{indexPrice}</TableCell>
-                <TableCell align="right">{markPrice - indexPrice}</TableCell>
+                <TableCell align="right">
+                  {thousandsSeparator(oraclePrice)}
+                </TableCell>
+                <TableCell align="right">
+                  {thousandsSeparator(indexPrice)}
+                </TableCell>
+                <TableCell align="right">{oraclePrice - indexPrice}</TableCell>
+                <TableCell align="right">
+                  {(oraclePrice / indexPrice - 1) * 100}
+                </TableCell>
                 <TableCell align="right">{fundingRate}</TableCell>
                 <TableCell align="right">
                   {new Date(nextFundingRate).toLocaleString()}
@@ -109,22 +120,17 @@ export default function dYdX() {
         gutterBottom
         display="inline"
       >
-        {new Date(markPriceTime).toLocaleString()}
+        {new Date(oraclePriceTime).toLocaleString()}
       </Typography>
 
-      <Typography
-        sx={{ ml: 40, mt: 1, mb: -2 }}
-        variant="h6"
-        gutterBottom
-        // style={{ color: bids[0][0] == currentPrice ? "red" : "blue" }}
-      >
-        체결가: {currentPrice}
+      <Typography sx={{ ml: 40, mt: 1, mb: -2 }} variant="h6" gutterBottom>
+        체결가: ${thousandsSeparator(asks[0].price)}
       </Typography>
 
       <Grid container>
         <Paper elevation={1} sx={{ m: 3, width: 1 / 4 }}>
           <TableContainer component={Paper}>
-            <Table aria-label="simple table">
+            <Table aria-label="simple table" size="small">
               <TableHead>
                 <TableRow>
                   <TableCell>Volume</TableCell>
@@ -143,7 +149,7 @@ export default function dYdX() {
                       {bid.size}
                     </TableCell>
                     <TableCell align="right" style={{ color: "red" }}>
-                      {bid.price}
+                      {thousandsSeparator(bid.price)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -154,7 +160,7 @@ export default function dYdX() {
 
         <Paper elevation={1} sx={{ m: 3, width: 1 / 4 }}>
           <TableContainer component={Paper}>
-            <Table aria-label="simple table">
+            <Table aria-label="simple table" size="small">
               <TableHead>
                 <TableRow>
                   <TableCell>매도호가(최상단 = 가장 낮은 값)</TableCell>
@@ -172,7 +178,7 @@ export default function dYdX() {
                       scope="row"
                       style={{ color: "blue" }}
                     >
-                      {ask.price}
+                      {thousandsSeparator(ask.price)}
                     </TableCell>
                     <TableCell align="right">{ask.size}</TableCell>
                   </TableRow>
@@ -182,6 +188,13 @@ export default function dYdX() {
           </TableContainer>
         </Paper>
       </Grid>
+
+      <Typography sx={{ ml: 3, mt: 1, mb: 2 }} variant="subtitle1" gutterBottom>
+        Oracle Price: 청산을 계산하는 가격 Binance의 Mark Price랑 비슷
+      </Typography>
+      <Typography sx={{ ml: 3, mt: 1, mb: 2 }} variant="subtitle1" gutterBottom>
+        Index Price: 현물 가격이라고 생각해도 된다.
+      </Typography>
     </>
   )
 }
