@@ -10,6 +10,7 @@ import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
 import axios from "axios"
 import thousandsSeparator from "../utils/thousandsSeparator"
+import BarChart from "../components/BarChart"
 
 export default function Binancedydx() {
   const [binanceMarkPrice, setBinanceMarkPrice] = useState(1)
@@ -30,11 +31,21 @@ export default function Binancedydx() {
   const [dydxAsk1, setDydxAsk1] = useState(
     Array.from({ length: 2 }, () => null)
   )
+  const [chartData, setChartData] = useState(null)
+  const [chartLabel, setChartLabel] = useState(null)
   const futuresBinance = "btcusdt"
   const futuresDydx = "BTC-USD"
 
   useEffect(() => {
-    let param = {}
+    // for bar chart
+    const getData = async () => {
+      const response = await axios.get("/api/binanceDydx")
+      setChartData(
+        response.data.rows.map((ele) => ele.binanceBid1 - ele.dydxBid1)
+      )
+      setChartLabel(response.data.rows.map((ele) => ele.createdTime))
+    }
+    getData()
 
     // binance
     const binanceMarkPriceEvery1sec = new WebSocket(
@@ -53,9 +64,6 @@ export default function Binancedydx() {
       const json = JSON.parse(data).data
       setBinanceBid1(json.b[0])
       setBinanceAsk1(json.a[0])
-
-      param["binanceBid1"] = json.b[0][0]
-      param["binanceAsk1"] = json.a[0][0]
     }
 
     // dydx
@@ -79,17 +87,7 @@ export default function Binancedydx() {
       )
       setDydxAsk1(data.asks[0])
       setDydxBid1(data.bids[0])
-
-      param["dydxBid1"] = data.bids[0].price
-      param["dydxAsk1"] = data.asks[0].price
     }, 500)
-
-    // db logging 1분
-    setInterval(async () => {
-      const { data } = await axios.get(
-        `/api/binanceDydx/${param.binanceBid1}/${param.binanceAsk1}/${param.dydxBid1}/${param.dydxAsk1}`
-      )
-    }, 60000)
   }, [])
 
   return (
@@ -212,6 +210,8 @@ export default function Binancedydx() {
       <Typography sx={{ ml: 3, mb: 2 }} variant="subtitle1" gutterBottom>
         dYdX 수수료: 0%($10만 이하) or 0.02%($10만 초과)
       </Typography>
+
+      <BarChart chartData={chartData} chartLabel={chartLabel} />
     </>
   )
 }

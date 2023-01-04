@@ -14,7 +14,9 @@
     "@mui/icons-material": "^5.10.9",
     "@mui/material": "^5.10.12",
     "@mui/styled-engine-sc": "^5.10.6",
+    "add": "^2.0.6",
     "axios": "^1.2.2",
+    "chart.js": "^4.1.1",
     "eslint": "8.26.0",
     "eslint-config-next": "13.0.1",
     "fs": "^0.0.1-security",
@@ -22,11 +24,13 @@
     "net": "^1.0.2",
     "next": "13.0.1",
     "react": "18.2.0",
+    "react-chartjs-2": "^5.1.0",
     "react-dom": "18.2.0",
     "react-timetable-events": "^2.0.0",
     "styled-components": "^5.3.6",
     "tls": "^0.0.1",
     "utf-8-validate": "^5.0.10",
-    "ws": "^8.11.0"
+    "ws": "^8.11.0",
+    "yarn": "^1.22.19"
   }
 }
