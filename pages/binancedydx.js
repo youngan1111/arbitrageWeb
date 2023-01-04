@@ -13,54 +13,49 @@ import thousandsSeparator from "../utils/thousandsSeparator"
 
 export default function Binancedydx() {
   const [binanceMarkPrice, setBinanceMarkPrice] = useState(1)
-  const [binanceMarkPriceTime, setBinanceMarkPriceTime] = useState(null)
   const [binanceIndexPrice, setBinanceIndexPrice] = useState(1)
-  const [binanceCurrentPrice, setBinanceCurrentPrice] = useState(1)
   const [binanceFundingRate, setBinanceFundingRate] = useState(null)
-  const [binanceNextFundingRate, setBinanceNextFundingRate] = useState(null)
-  const [binanceOrderBookTime, setBinanceOrderBookTime] = useState(null)
   const [binanceBid1, setBinanceBid1] = useState(
     Array.from({ length: 2 }, () => null)
   )
   const [binanceAsk1, setBinanceAsk1] = useState(
     Array.from({ length: 2 }, () => null)
   )
-
   const [dydxMarkPrice, setDydxMarkPrice] = useState(1)
-  const [dydxMarkPriceTime, setDydxMarkPriceTime] = useState(null)
   const [dydxIndexPrice, setDydxIndexPrice] = useState(1)
   const [dydxFundingRate, setDydxFundingRate] = useState([])
-  const [dydxNextFundingRate, setDydxNextFundingRate] = useState([])
   const [dydxBid1, setDydxBid1] = useState(
     Array.from({ length: 2 }, () => null)
   )
   const [dydxAsk1, setDydxAsk1] = useState(
     Array.from({ length: 2 }, () => null)
   )
-
   const futuresBinance = "btcusdt"
   const futuresDydx = "BTC-USD"
 
   useEffect(() => {
+    let param = {}
+
+    // binance
     const binanceMarkPriceEvery1sec = new WebSocket(
       `wss://fstream.binance.com/ws/${futuresBinance}@markPrice@1s`
     )
     binanceMarkPriceEvery1sec.onmessage = ({ data }) => {
       const json = JSON.parse(data)
       setBinanceMarkPrice(json.p)
-      setBinanceMarkPriceTime(json.E)
       setBinanceIndexPrice(json.i)
       setBinanceFundingRate(json.r)
-      setBinanceNextFundingRate(json.T)
     }
     const binanceOrderBookEvery100ms = new WebSocket(
       `wss://fstream.binance.com/stream?streams=${futuresBinance}@depth10@500ms` // 250ms, 500ms or 100ms
     )
     binanceOrderBookEvery100ms.onmessage = ({ data }) => {
       const json = JSON.parse(data).data
-      setBinanceOrderBookTime(json.E)
       setBinanceBid1(json.b[0])
       setBinanceAsk1(json.a[0])
+
+      param["binanceBid1"] = json.b[0][0]
+      param["binanceAsk1"] = json.a[0][0]
     }
 
     // dydx
@@ -69,20 +64,32 @@ export default function Binancedydx() {
         params: {
           market: futuresDydx,
         },
+        validateStatus: (status) => status < 500,
       })
       setDydxMarkPrice(data.markets[futuresDydx].oraclePrice)
-      setDydxMarkPriceTime(new Date().getTime())
       setDydxIndexPrice(data.markets[futuresDydx].indexPrice)
       setDydxFundingRate(data.markets[futuresDydx].nextFundingRate)
-      setDydxNextFundingRate(data.markets[futuresDydx].nextFundingAt)
     }, 1000)
     setInterval(async () => {
       const { data } = await axios.get(
-        "https://api.dydx.exchange/v3/orderbook/BTC-USD"
+        "https://api.dydx.exchange/v3/orderbook/BTC-USD",
+        {
+          validateStatus: (status) => status < 500,
+        }
       )
       setDydxAsk1(data.asks[0])
       setDydxBid1(data.bids[0])
-    }, 1000)
+
+      param["dydxBid1"] = data.bids[0].price
+      param["dydxAsk1"] = data.asks[0].price
+    }, 500)
+
+    // db logging 1분
+    setInterval(async () => {
+      const { data } = await axios.get(
+        `/api/binanceDydx/${param.binanceBid1}/${param.binanceAsk1}/${param.dydxBid1}/${param.dydxAsk1}`
+      )
+    }, 60000)
   }, [])
 
   return (
@@ -100,11 +107,9 @@ export default function Binancedydx() {
                 <TableCell width={"5%"}>Symbol</TableCell>
                 <TableCell align="right">매수호가/수량 ($/BTC)</TableCell>
                 <TableCell align="right">매도호가/수량 ($/BTC)</TableCell>
+                <TableCell align="right">청산가 ($)</TableCell>
                 <TableCell align="right">Index Price ($)</TableCell>
-                <TableCell align="right">
-                  Mark Price – Index Price ($)
-                </TableCell>
-                <TableCell align="right">Funding Rate</TableCell>
+                <TableCell align="right">Funding Rate (%)</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -124,12 +129,10 @@ export default function Binancedydx() {
                   {thousandsSeparator(binanceAsk1[0])} / {binanceAsk1[1]}
                 </TableCell>
                 <TableCell align="right">
-                  {binanceMarkPrice - binanceIndexPrice}
+                  {thousandsSeparator(binanceMarkPrice)}
                 </TableCell>
-                <TableCell align="right">
-                  {(binanceMarkPrice / binanceIndexPrice - 1) * 100}
-                </TableCell>
-                <TableCell align="right">{binanceFundingRate}</TableCell>
+                <TableCell align="right">{binanceIndexPrice}</TableCell>
+                <TableCell align="right">{binanceFundingRate * 100}</TableCell>
               </TableRow>
 
               <TableRow
@@ -148,21 +151,37 @@ export default function Binancedydx() {
                   {thousandsSeparator(dydxAsk1.price)} / {dydxAsk1.size}
                 </TableCell>
                 <TableCell align="right">
-                  {dydxMarkPrice - dydxIndexPrice}
+                  {thousandsSeparator(dydxMarkPrice)}
                 </TableCell>
-                <TableCell align="right">
-                  {(dydxMarkPrice / dydxIndexPrice - 1) * 100}
-                </TableCell>
-                <TableCell align="right">{dydxFundingRate}</TableCell>
+                <TableCell align="right">{dydxIndexPrice}</TableCell>
+                <TableCell align="right">{dydxFundingRate * 100}</TableCell>
               </TableRow>
 
-              {/* <TableRow
+              <TableRow
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
                   비교
                 </TableCell>
-                <TableCell align="right" colSpan={3}>
+                <TableCell align="right" colSpan={2}>
+                  {binanceBid1[0] > dydxBid1.price
+                    ? `BINANCE가 $${(binanceBid1[0] - dydxBid1.price).toFixed(
+                        4
+                      )} 만큼 높다`
+                    : `dYdX가 $${(dydxBid1.price - binanceBid1[0]).toFixed(
+                        4
+                      )} 만큼 높다`}
+                </TableCell>
+                <TableCell align="right">
+                  {binanceAsk1[0] > dydxAsk1.price
+                    ? `BINANCE가 $${(binanceAsk1[0] - dydxAsk1.price).toFixed(
+                        4
+                      )} 만큼 높다`
+                    : `dYdX가 $${(dydxAsk1.price - binanceAsk1[0]).toFixed(
+                        4
+                      )} 만큼 높다`}
+                </TableCell>
+                <TableCell align="right">
                   {binanceMarkPrice > dydxMarkPrice
                     ? `BINANCE가 $${(binanceMarkPrice - dydxMarkPrice).toFixed(
                         4
@@ -171,7 +190,7 @@ export default function Binancedydx() {
                         4
                       )} 만큼 높다`}
                 </TableCell>
-                <TableCell align="left" colSpan={2}>
+                <TableCell align="right">
                   {binanceIndexPrice > dydxIndexPrice
                     ? `BINANCE가 $${(
                         binanceIndexPrice - dydxIndexPrice
@@ -181,13 +200,18 @@ export default function Binancedydx() {
                       )} 만큼 높다`}
                 </TableCell>
                 <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
-              </TableRow> */}
+              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>
       </Paper>
+
+      <Typography sx={{ ml: 3, mt: 1 }} variant="subtitle1" gutterBottom>
+        바이낸스 USDT 선물 수수료: 0.02%
+      </Typography>
+      <Typography sx={{ ml: 3, mb: 2 }} variant="subtitle1" gutterBottom>
+        dYdX 수수료: 0%($10만 이하) or 0.02%($10만 초과)
+      </Typography>
     </>
   )
 }
