@@ -10,8 +10,17 @@ import {
 } from "chart.js"
 import { Bar } from "react-chartjs-2"
 import Paper from "@mui/material/Paper"
+import zoomPlugin from "chartjs-plugin-zoom"
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  zoomPlugin
+)
 
 export default function BarChart({ chartData, chartLabel }) {
   const options = {
@@ -19,6 +28,24 @@ export default function BarChart({ chartData, chartLabel }) {
     plugins: {
       legend: {
         position: "top",
+      },
+      zoom: {
+        zoom: {
+          wheel: {
+            enabled: true,
+          },
+          drag: {
+            enabled: true,
+          },
+          pinch: {
+            enabled: true,
+          },
+          mode: "x",
+        },
+        pan: {
+          enabled: true,
+          mode: "x",
+        },
       },
     },
   }

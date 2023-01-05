@@ -10,7 +10,11 @@ import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
 import axios from "axios"
 import thousandsSeparator from "../utils/thousandsSeparator"
-import BarChart from "../components/BarChart"
+import dynamic from "next/dynamic"
+
+const ComponentsWithNoSSR = dynamic(() => import("../components/BarChart"), {
+  ssr: false,
+})
 
 export default function Binancedydx() {
   const [binanceMarkPrice, setBinanceMarkPrice] = useState(1)
@@ -211,7 +215,7 @@ export default function Binancedydx() {
         dYdX 수수료: 0%($10만 이하) or 0.02%($10만 초과)
       </Typography>
 
-      <BarChart chartData={chartData} chartLabel={chartLabel} />
+      <ComponentsWithNoSSR chartData={chartData} chartLabel={chartLabel} />
     </>
   )
 }
