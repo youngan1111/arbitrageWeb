@@ -215,7 +215,11 @@ export default function Binancedydx() {
         dYdX 수수료: 0%($10만 이하) or 0.02%($10만 초과)
       </Typography>
 
-      <ComponentsWithNoSSR chartData={chartData} chartLabel={chartLabel} />
+      <ComponentsWithNoSSR
+        chartData={chartData}
+        chartLabel={chartLabel}
+        topLabel={"BINANCE Bid1 - dYdX Bid1"}
+      />
     </>
   )
 }

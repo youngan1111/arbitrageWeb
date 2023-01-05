@@ -22,7 +22,7 @@ ChartJS.register(
   zoomPlugin
 )
 
-export default function BarChart({ chartData, chartLabel }) {
+export default function BarChart({ chartData, chartLabel, topLabel }) {
   const options = {
     responsive: true,
     plugins: {
@@ -32,9 +32,6 @@ export default function BarChart({ chartData, chartLabel }) {
       zoom: {
         zoom: {
           wheel: {
-            enabled: true,
-          },
-          drag: {
             enabled: true,
           },
           pinch: {
@@ -54,7 +51,7 @@ export default function BarChart({ chartData, chartLabel }) {
     labels: chartLabel,
     datasets: [
       {
-        label: "BINANCE Bid1 - dYdX Bid1",
+        label: topLabel,
         data: chartData,
         backgroundColor: "rgba(255, 99, 132, 0.5)",
       },

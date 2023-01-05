@@ -16,6 +16,10 @@ const sections = [
     title: "BINANCE & dYdX",
     url: "/binancedydx",
   },
+  {
+    title: "BINANCE Perp vs Quarter",
+    url: "/binancePerpQuarter",
+  },
 ]
 
 export default function Header({ path }) {

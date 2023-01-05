@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   const connection = await pool.getConnection(async (conn) => conn)
 
   const [rows] = await connection.query(
-    `SELECT binanceBid1, dydxBid1, DATE_FORMAT(createdTime,'%m/%d %H:%i') createdTime FROM binanceDydxPrice ORDER BY createdTIme ASC;`
+    `SELECT perpBid1, quarterBid1, DATE_FORMAT(createdTime,'%m/%d %H:%i') createdTime FROM binancePerpQuarterPriceDiff ORDER BY createdTIme ASC;`
   )
 
   connection.release()
