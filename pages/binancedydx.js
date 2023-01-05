@@ -107,8 +107,8 @@ export default function Binancedydx() {
               <TableRow>
                 <TableCell width={"5%"}>Exchange</TableCell>
                 <TableCell width={"5%"}>Symbol</TableCell>
-                <TableCell align="right">매수호가/수량 ($/BTC)</TableCell>
-                <TableCell align="right">매도호가/수량 ($/BTC)</TableCell>
+                <TableCell align="right">매수호가/수량 Bid1 ($/BTC)</TableCell>
+                <TableCell align="right">매도호가/수량 Ask1 ($/BTC)</TableCell>
                 <TableCell align="right">청산가 ($)</TableCell>
                 <TableCell align="right">Index Price ($)</TableCell>
                 <TableCell align="right">Funding Rate (%)</TableCell>
@@ -169,37 +169,37 @@ export default function Binancedydx() {
                   {binanceBid1[0] > dydxBid1.price
                     ? `BINANCE가 $${(binanceBid1[0] - dydxBid1.price).toFixed(
                         4
-                      )} 만큼 높다`
+                      )} 높다`
                     : `dYdX가 $${(dydxBid1.price - binanceBid1[0]).toFixed(
                         4
-                      )} 만큼 높다`}
+                      )} 높다`}
                 </TableCell>
                 <TableCell align="right">
                   {binanceAsk1[0] > dydxAsk1.price
                     ? `BINANCE가 $${(binanceAsk1[0] - dydxAsk1.price).toFixed(
                         4
-                      )} 만큼 높다`
+                      )} 높다`
                     : `dYdX가 $${(dydxAsk1.price - binanceAsk1[0]).toFixed(
                         4
-                      )} 만큼 높다`}
+                      )} 높다`}
                 </TableCell>
                 <TableCell align="right">
                   {binanceMarkPrice > dydxMarkPrice
                     ? `BINANCE가 $${(binanceMarkPrice - dydxMarkPrice).toFixed(
                         4
-                      )} 만큼 높다`
+                      )} 높다`
                     : `dYdX가 $${(dydxMarkPrice - binanceMarkPrice).toFixed(
                         4
-                      )} 만큼 높다`}
+                      )} 높다`}
                 </TableCell>
                 <TableCell align="right">
                   {binanceIndexPrice > dydxIndexPrice
                     ? `BINANCE가 $${(
                         binanceIndexPrice - dydxIndexPrice
-                      ).toFixed(4)} 만큼 높다`
+                      ).toFixed(4)} 높다`
                     : `dYdX가 $${(dydxIndexPrice - binanceIndexPrice).toFixed(
                         4
-                      )} 만큼 높다`}
+                      )} 높다`}
                 </TableCell>
                 <TableCell align="right"></TableCell>
               </TableRow>

@@ -62,10 +62,10 @@ export default function BinancePerpQuarter() {
       setPerpIndexPrice(json.i)
       setPerpFundingRate(json.r)
     }
-    const perpOrderBookEvery100ms = new WebSocket(
+    const perpOrderBookEvery500ms = new WebSocket(
       `wss://fstream.binance.com/stream?streams=${perpBinance}@depth10@500ms` // 250ms, 500ms or 100ms
     )
-    perpOrderBookEvery100ms.onmessage = ({ data }) => {
+    perpOrderBookEvery500ms.onmessage = ({ data }) => {
       const json = JSON.parse(data).data
       setPerpBid1(json.b[0])
       setPerpAsk1(json.a[0])
@@ -81,10 +81,10 @@ export default function BinancePerpQuarter() {
       setQuarterIndexPrice(json.i)
       setQuarterFundingRate(json.r)
     }
-    const quarterOrderBookEvery100ms = new WebSocket(
+    const quarterOrderBookEvery500ms = new WebSocket(
       `wss://fstream.binance.com/stream?streams=${quarterBinance}@depth10@500ms` // 250ms, 500ms or 100ms
     )
-    quarterOrderBookEvery100ms.onmessage = ({ data }) => {
+    quarterOrderBookEvery500ms.onmessage = ({ data }) => {
       const json = JSON.parse(data).data
       setQuarterBid1(json.b[0])
       setQuarterAsk1(json.a[0])
@@ -168,30 +168,47 @@ export default function BinancePerpQuarter() {
                 </TableCell>
                 <TableCell align="right" colSpan={2}>
                   {perpBid1[0] > quarterBid1[0]
-                    ? `무기한 선물이 $${(perpBid1[0] - quarterBid1[0]).toFixed(
-                        4
-                      )} 만큼 높다`
-                    : `만기 선물이 $${(quarterBid1[0] - perpBid1[0]).toFixed(
-                        4
-                      )} 만큼 높다`}
+                    ? `무기한 선물이 ${(
+                        ((perpBid1[0] - quarterBid1[0]) / quarterBid1[0]) *
+                        100
+                      ).toFixed(3)}% ($${perpBid1[0] - quarterBid1[0]}) 높다`
+                    : `만기 선물이 ${(
+                        ((quarterBid1[0] - perpBid1[0]) / perpBid1[0]) *
+                        100
+                      ).toFixed(3)}% ($${(quarterBid1[0] - perpBid1[0]).toFixed(
+                        2
+                      )}) 높다`}
                 </TableCell>
                 <TableCell align="right">
                   {perpAsk1[0] > quarterAsk1[0]
-                    ? `무기한 선물이 $${(perpAsk1[0] - quarterAsk1[0]).toFixed(
-                        4
-                      )} 만큼 높다`
-                    : `만기 선물이 $${(quarterAsk1[0] - perpAsk1[0]).toFixed(
-                        4
-                      )} 만큼 높다`}
+                    ? `무기한 선물이 ${(
+                        ((perpAsk1[0] - quarterAsk1[0]) / quarterAsk1[0]) *
+                        100
+                      ).toFixed(3)}% ($${(perpAsk1[0] - quarterAsk1[0]).toFixed(
+                        2
+                      )}) 높다`
+                    : `만기 선물이 ${(
+                        ((quarterAsk1[0] - perpAsk1[0]) / perpAsk1[0]) *
+                        100
+                      ).toFixed(3)}% ($${(quarterAsk1[0] - perpAsk1[0]).toFixed(
+                        2
+                      )}) 높다`}
                 </TableCell>
                 <TableCell align="right">
                   {perpMarkPrice > quarterMarkPrice
-                    ? `무기한 선물이 $${(
+                    ? `무기한 선물이 ${(
+                        ((perpMarkPrice - quarterMarkPrice) /
+                          quarterMarkPrice) *
+                        100
+                      ).toFixed(3)}% ($${(
                         perpMarkPrice - quarterMarkPrice
-                      ).toFixed(4)} 만큼 높다`
-                    : `만기 선물이 $${(
+                      ).toFixed(2)}) 높다`
+                    : `만기 선물이 ${(
+                        ((quarterMarkPrice - perpMarkPrice) / perpMarkPrice) *
+                        100
+                      ).toFixed(3)}% ($${(
                         quarterMarkPrice - perpMarkPrice
-                      ).toFixed(4)} 만큼 높다`}
+                      ).toFixed(2)}) 높다`}
                 </TableCell>
                 <TableCell align="right"></TableCell>
                 <TableCell align="right"></TableCell>
@@ -202,13 +219,13 @@ export default function BinancePerpQuarter() {
       </Paper>
 
       <Typography sx={{ ml: 3, mt: 1 }} variant="subtitle1" gutterBottom>
-        바이낸스 USDT 무기한 선물 수수료: 0.02%
+        바이낸스 USDT 무기한/만기 선물 수수료: 0.02%
       </Typography>
 
       <ComponentsWithNoSSR
         chartData={chartData}
         chartLabel={chartLabel}
-        topLabel={"만기 선물가 - 무기한 선물가"}
+        topLabel={"만기선물 - 무기한선물 ($)"}
       />
     </>
   )
