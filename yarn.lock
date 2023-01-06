@@ -850,6 +850,11 @@ chart.js@^4.1.1:
   dependencies:
     "@kurkle/color" "^0.3.0"
 
+chartjs-plugin-annotation@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/chartjs-plugin-annotation/-/chartjs-plugin-annotation-2.1.1.tgz#686865387d8e81130dfd81437cc4a70145df7a98"
+  integrity sha512-RVKfwNpecvVZdEUshqk9RtqjwVn9koehQBiz1ZWclgFOVayr2CSTENI6VqsyjuYtzBTFEX6Qark7SqYtnwNiAA==
+
 chartjs-plugin-zoom@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/chartjs-plugin-zoom/-/chartjs-plugin-zoom-2.0.0.tgz#b02f5c4422fe517d0fb5d188b408158fef76c415"

@@ -218,7 +218,7 @@ export default function Binancedydx() {
       <ComponentsWithNoSSR
         chartData={chartData}
         chartLabel={chartLabel}
-        topLabel={"BINANCE Bid1 - dYdX Bid1"}
+        topLabel={"BINANCE Bid1 - dYdX Bid1 ($)"}
       />
     </>
   )
