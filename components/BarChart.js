@@ -12,6 +12,7 @@ import { Bar } from "react-chartjs-2"
 import Paper from "@mui/material/Paper"
 import zoomPlugin from "chartjs-plugin-zoom"
 import annotationPlugin from "chartjs-plugin-annotation"
+import getDateRange from "../utils/getDatesStartToLast"
 
 ChartJS.register(
   CategoryScale,
@@ -20,35 +21,9 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  zoomPlugin
-  // annotationPlugin
+  zoomPlugin,
+  annotationPlugin
 )
-
-// const annotation1 = {
-//   type: "line",
-//   borderColor: "black",
-//   borderWidth: 1,
-//   label: {
-//     backgroundColor: "navy",
-//     content: "Label",
-//     display: true,
-//   },
-//   scaleID: "x",
-//   value: "01/05 12:00",
-// }
-// const annotation2 = {
-//   type: "line",
-//   borderColor: "black",
-//   borderWidth: 1,
-//   label: {
-//     backgroundColor: "navy",
-//     content: "Label",
-//     display: true,
-//   },
-//   scaleID: "x",
-//   value: "01/06 00:00",
-// }
-// const annotations = { annotation1, annotation2 }
 
 export default function BarChart({ chartData, chartLabel, topLabel }) {
   const options = {
@@ -72,9 +47,26 @@ export default function BarChart({ chartData, chartLabel, topLabel }) {
           mode: "x",
         },
       },
-      // annotation: {
-      //   annotations,
-      // },
+      annotation: {
+        annotations: getDateRange(
+          "2023-01-07",
+          new Date().toISOString().slice(0, 10)
+        ).map((ele) => {
+          let temp = {
+            type: "line",
+            borderColor: "black",
+            borderWidth: 1,
+            label: {
+              backgroundColor: "navy",
+              content: `${ele} 00:00`,
+              display: true,
+            },
+            scaleID: "x",
+            value: `${ele} 00:00`,
+          }
+          return temp
+        }),
+      },
     },
   }
 
