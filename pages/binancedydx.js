@@ -37,6 +37,8 @@ export default function Binancedydx() {
   )
   const [chartData, setChartData] = useState(null)
   const [chartLabel, setChartLabel] = useState(null)
+  const [nextBinanceFundingRate, setBinanceNextFundingRate] = useState(null)
+  const [nextDydxFundingRate, setDydxNextFundingRate] = useState(null)
   const futuresBinance = "btcusdt"
   const futuresDydx = "BTC-USD"
 
@@ -60,6 +62,7 @@ export default function Binancedydx() {
       setBinanceMarkPrice(json.p)
       setBinanceIndexPrice(json.i)
       setBinanceFundingRate(json.r)
+      setBinanceNextFundingRate(json.T)
     }
     const binanceOrderBookEvery100ms = new WebSocket(
       `wss://fstream.binance.com/stream?streams=${futuresBinance}@depth10@500ms` // 250ms, 500ms or 100ms
@@ -81,6 +84,7 @@ export default function Binancedydx() {
       setDydxMarkPrice(data.markets[futuresDydx].oraclePrice)
       setDydxIndexPrice(data.markets[futuresDydx].indexPrice)
       setDydxFundingRate(data.markets[futuresDydx].nextFundingRate)
+      setDydxNextFundingRate(data.markets[futuresDydx].nextFundingAt)
     }, 1000)
     setInterval(async () => {
       const { data } = await axios.get(
@@ -112,6 +116,7 @@ export default function Binancedydx() {
                 <TableCell align="right">청산가 ($)</TableCell>
                 <TableCell align="right">Index Price ($)</TableCell>
                 <TableCell align="right">Funding Rate (%)</TableCell>
+                <TableCell align="right">Next Funding Rate Time</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -135,6 +140,9 @@ export default function Binancedydx() {
                 </TableCell>
                 <TableCell align="right">{binanceIndexPrice}</TableCell>
                 <TableCell align="right">{binanceFundingRate * 100}</TableCell>
+                <TableCell align="right">
+                  {new Date(nextBinanceFundingRate).toLocaleString()}
+                </TableCell>
               </TableRow>
 
               <TableRow
@@ -157,6 +165,9 @@ export default function Binancedydx() {
                 </TableCell>
                 <TableCell align="right">{dydxIndexPrice}</TableCell>
                 <TableCell align="right">{dydxFundingRate * 100}</TableCell>
+                <TableCell align="right">
+                  {new Date(nextDydxFundingRate).toLocaleString()}
+                </TableCell>
               </TableRow>
 
               <TableRow
@@ -213,6 +224,9 @@ export default function Binancedydx() {
       </Typography>
       <Typography sx={{ ml: 3, mb: 2 }} variant="subtitle1" gutterBottom>
         dYdX 수수료: 0%($10만 이하) or 0.02%($10만 초과)
+      </Typography>
+      <Typography sx={{ ml: 3, mb: 2 }} variant="subtitle1" gutterBottom>
+        하단 음수면 dydx short & binance long
       </Typography>
 
       <ComponentsWithNoSSR
