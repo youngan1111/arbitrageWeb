@@ -40,6 +40,9 @@ export default function BarChart({ chartData, chartLabel, topLabel }) {
           pinch: {
             enabled: true,
           },
+          drag: {
+            enabled: false,
+          },
           mode: "x",
         },
         pan: {
@@ -82,7 +85,7 @@ export default function BarChart({ chartData, chartLabel, topLabel }) {
   }
 
   return (
-    <Paper elevation={1} sx={{ mx: 7, my: 3 }}>
+    <Paper elevation={1} sx={{ m: 3 }}>
       <Bar options={options} data={data} />
     </Paper>
   )
