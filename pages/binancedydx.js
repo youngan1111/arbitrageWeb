@@ -11,6 +11,10 @@ import Paper from "@mui/material/Paper"
 import axios from "axios"
 import thousandsSeparator from "../utils/thousandsSeparator"
 import dynamic from "next/dynamic"
+import InputLabel from "@mui/material/InputLabel"
+import MenuItem from "@mui/material/MenuItem"
+import FormControl from "@mui/material/FormControl"
+import Select from "@mui/material/Select"
 
 const ComponentsWithNoSSR = dynamic(() => import("../components/BarChart"), {
   ssr: false,
@@ -39,6 +43,8 @@ export default function Binancedydx() {
   const [chartLabel, setChartLabel] = useState(null)
   const [nextBinanceFundingRate, setBinanceNextFundingRate] = useState(null)
   const [nextDydxFundingRate, setDydxNextFundingRate] = useState(null)
+  const [dataInterval, setDataInterval] = useState(10)
+
   const futuresBinance = "btcusdt"
   const futuresDydx = "BTC-USD"
 
@@ -228,6 +234,25 @@ export default function Binancedydx() {
       <Typography sx={{ ml: 3, mb: 2 }} variant="subtitle1" gutterBottom>
         하단 음수면 dydx short & binance long
       </Typography>
+
+      <FormControl
+        variant="standard"
+        sx={{ ml: 3, marginY: 0, minWidth: 120 }}
+        size="small"
+      >
+        <InputLabel>Interval</InputLabel>
+        <Select
+          defaultValue=""
+          value={dataInterval}
+          label="Interval"
+          onChange={(event) => {
+            setDataInterval(event.target.value)
+          }}
+        >
+          <MenuItem value={1}>1</MenuItem>
+          <MenuItem value={10}>10</MenuItem>
+        </Select>
+      </FormControl>
 
       <ComponentsWithNoSSR
         chartData={chartData}
