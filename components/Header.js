@@ -20,6 +20,10 @@ const sections = [
     title: "BINANCE Perp vs Quarter",
     url: "/binancePerpQuarter",
   },
+  {
+    title: "arbitrage testnet",
+    url: "/arbitrageTestnet",
+  },
 ]
 
 export default function Header({ path }) {
