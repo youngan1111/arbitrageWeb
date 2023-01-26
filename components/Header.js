@@ -21,7 +21,7 @@ const sections = [
     url: "/binancePerpQuarter",
   },
   {
-    title: "arbitrage testnet",
+    title: "Arbitrage testnet",
     url: "/arbitrageTestnet",
   },
 ]
