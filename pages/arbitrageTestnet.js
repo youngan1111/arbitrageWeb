@@ -80,18 +80,18 @@ export default function arbitrageTestnet() {
       setDydxTotalPNL(dydxPNL)
 
       for (let i = data.binance.length - 2; i > -1; i--) {
-        if (netDydxQuantity === 0) data.binance[i].pnl = "진입"
+        if (netBinanceQuantity === 0) data.binance[i].pnl = "진입"
 
         data.binance[i].side == "SELL"
-          ? (netDydxQuantity = roundTwo(
-              netDydxQuantity - Number(data.binance[i].avgQuantity)
+          ? (netBinanceQuantity = roundTwo(
+              netBinanceQuantity - Number(data.binance[i].avgQuantity)
             ))
-          : (netDydxQuantity = roundTwo(
-              netDydxQuantity + Number(data.binance[i].avgQuantity)
+          : (netBinanceQuantity = roundTwo(
+              netBinanceQuantity + Number(data.binance[i].avgQuantity)
             ))
 
         // close position
-        if (netDydxQuantity === 0) {
+        if (netBinanceQuantity === 0) {
           if (data.binance[i].side === "SELL") {
             data.binance[i].pnl = roundTwo(
               (Number(data.binance[i].avgPrice) - temp.price) * temp.size
@@ -132,7 +132,7 @@ export default function arbitrageTestnet() {
     <>
       <Header path="/arbitrageTestnet" />
       <Typography sx={{ ml: 3, mt: 1, mb: 2 }} variant="h5" gutterBottom>
-        · Arbitrage testnet
+        · Trade History
       </Typography>
 
       <Grid container spacing={2} sx={{ mb: 3 }}>
