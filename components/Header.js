@@ -24,6 +24,10 @@ const sections = [
     title: "Arbitrage testnet",
     url: "/arbitrageTestnet",
   },
+  {
+    title: "Ref.finance",
+    url: "/refFinance",
+  },
 ]
 
 export default function Header({ path }) {

@@ -14,6 +14,7 @@
     "@mui/icons-material": "^5.10.9",
     "@mui/material": "^5.10.12",
     "@mui/styled-engine-sc": "^5.10.6",
+    "@ref-finance/ref-sdk": "^1.1.8",
     "add": "^2.0.6",
     "axios": "^1.2.2",
     "chart.js": "^4.1.1",
